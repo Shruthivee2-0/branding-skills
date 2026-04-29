@@ -107,6 +107,51 @@ Enterprise Purple:  #6F2CBA   (strong purple accent)
 - Topic 6: `#A4EEC4` fill (Flora Green accent)
 - All box borders: `#000000` — always
 
+**Five Forces / hub-and-spoke layout — canonical rules (match this exactly):**
+- All 4 corner force cards: identical size `240×160px`, equal padding `16px` all sides
+- Force 05 (bottom centre): same width `240px`, height auto to content, same padding `16px`
+- Hub: black filled circle, centred, with 4–5 fading concentric rings behind it
+- Arrows: dashed, from the nearest corner/edge of each card straight to the hub circle boundary
+- Cards sit at diagonal positions from hub — top-left, top-right, bottom-left, bottom-right, bottom-centre
+- Gap between card edge and hub circle: ~60–80px
+- All text rendered as native SVG `<text>` elements — never `foreignObject` for card content
+- Card body text: wrap manually with explicit `<text>` lines, max ~32 chars per line at 11px
+- Eyebrow / Stage label: IBM Plex Mono **15px** weight 700, colour matches family accent — this is the minimum. Never use 8px, 9px, or 11px for eyebrows.
+- Title: Inter 13px weight 600
+- Body: Inter 11px weight 400, colour `#454545`, line-height ~16px
+
+**foreignObject sizing — CRITICAL:** When using `<foreignObject>` inside SVG to render HTML content, always set the `height` large enough to contain all text at any wrapping width. Never use a fixed height that could clip content. The safe approach is to set `height` generously (e.g. 200px for a card that visually needs ~130px) and let the SVG canvas provide the visual boundary. If you need a visible border/background, draw it as a separate SVG `<rect>` sized to the intended visual dimensions, and let the `<foreignObject>` be taller. This ensures text never clips or overflows out of a box.
+
+**Em dashes — NEVER use:** Never use em dashes (—) in any text, labels, captions, or body copy in infographics. Replace with: a comma, a colon, a period, or rewrite the sentence to avoid the need for a dash entirely. If content from a source uses an em dash, rewrite it on output.
+
+**Internal alignment — CRITICAL:** Every element inside a card or box must start at the same x-axis. Use a single padding constant (e.g. `pad=14`) and derive ALL element x positions from `card_x + pad`. This includes: eyebrow labels, icons, headings, body text lines, chips, divider lines, metric labels, and metric values. Never let any element inside a card start at a different x than the others. Divider lines must also START at `card_x + pad` and END at `card_x + card_width - pad`.
+
+**No placeholders:** Never add placeholder content, example text, or dummy items unless the user explicitly asks for them. Only include content that was requested or provided.
+
+**Text containment — CRITICAL:** All text must stay within its bounding box with equal padding on all sides. Rules:
+- Set a `usable_width = card_width - 2 * padding` and never let any text line exceed that width
+- At 11px Inter, safe line length = `usable_width / 6.5` characters (approximate)
+- At 13px Inter 600, safe line length = `usable_width / 7.5` characters
+- At 15px Inter 700, safe line length = `usable_width / 8.5` characters
+- Always manually hard-wrap every line to fit within usable_width before rendering
+- Never use foreignObject for card text — always native SVG text with explicit x/y per line
+
+**Row width consistency — CRITICAL:** When a layout has multiple horizontal rows stacked vertically (e.g. a section label row, a card row, a strip row, a reading order bar), all rows must span exactly the same total width. Never let one row be wider or narrower than another. Derive the total width from the widest natural row (usually the card grid: 5 cards × card_width + 4 gaps), then set every other row — headers, section labels, full-width bars, reading order boxes — to that exact same width.
+
+**Divider lines inside boxes:** Always add a minimum of 15px padding above and below every divider line. In SVG this means the divider `y` must be at least 15px below the last element above it, and the next element must start at least 15px below the divider `y`.
+
+**Divider lines inside boxes (colour rule):** When drawing a horizontal rule to separate sections within a box, use a shade darker than the box fill — not a fixed grey. Derive it from the same colour family:
+- Orange box (`#FFF2EB`): divider `#FFBCA3`
+- Purple box (`#F3EBFF`): divider `#CDAFF7`
+- Blue box (`#E5F4FF`): divider `#80C1FF`
+- Yellow box (`#FFF9E0`): divider `#FFD875`
+- Magenta box (`#FEF1FD`): divider `#FFCCFC`
+- Green box (`#A4EEC4`): divider `#2daa72` at 30% opacity
+- Grey box (`#E6E6E6`): divider `#A1A1A1`
+- White box (`#fff`): divider `#E6E6E6`
+
+**Owner / label chips inside cards:** Always `background:#000; color:#fff` — black chip, white text. Never light grey chips with grey text.
+
 **Status indicator colors:**
 - Check / success: `#A4EEC4` fill with `#000000` ✓ glyph (Flora Green)
 - Warning: `#FFD875` fill with `#000000` ! glyph (Y:40 Elemental Yellow)
@@ -127,7 +172,8 @@ Type ramp:
 **Title case:** All headings and box titles must use title case — capitalise every major word. Articles (a, an, the), short prepositions (in, on, of, at, by), and conjunctions (and, or, but) are lowercase unless they are the first word. IBM Plex Mono labels (axes, tags, captions) use all-uppercase with `text-transform:uppercase`.
 - Body: 14px, weight 400, `#444444` — descriptions, body text
 - Subtext: 13px, weight 400, `#444444` — supporting text. **Never use weight 300 (light) — always use 400 (regular)**
-- Label: 11px, weight 400, `#888888`, IBM Plex Mono uppercase, letter-spacing 0.08em — axes, captions, tags
+- Eyebrow / Section label (STAGE 01, METRIC, DIAGRAM 1 etc): **15px**, weight 700, IBM Plex Mono uppercase — always 15px minimum
+- Axis / caption label: 11px, weight 400, `#888888`, IBM Plex Mono uppercase, letter-spacing 0.08em — axes, captions, small tags only
 
 Load from Google Fonts in HTML:
 ```html
@@ -391,7 +437,7 @@ Side-by-side comparisons, feature matrices, pros/cons.
   <text x="56" y="88" font-family="'Degular Display',Georgia,serif" font-size="28" font-weight="600" fill="#0a0a0a">Title Here</text>
 
   <!-- Mono label -->
-  <text x="56" y="110" font-family="'IBM Plex Mono','Courier New',monospace" font-size="11" fill="#888888" letter-spacing="2" text-transform="uppercase">SUBTITLE LABEL</text>
+  <text x="56" y="110" font-family="'IBM Plex Mono','Courier New',monospace" font-size="15" fill="#888888" letter-spacing="1" text-transform="uppercase">SUBTITLE LABEL</text>
 
   <!-- Content goes here -->
 
