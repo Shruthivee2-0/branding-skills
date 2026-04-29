@@ -148,4 +148,4 @@ The skill is maintained in `infographics/SKILL.md`. To update:
 
 ## Maintained By
 
-Postman Brand & Design — questions or updates, open a PR or ping the #brand-systems channel.
+Postman Brand & Design — questions or updates, ping the #creative channel on slack.
